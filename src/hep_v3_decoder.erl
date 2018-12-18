@@ -31,7 +31,7 @@ decode(<<"HEP3", Length:16, _/binary>> = Packet) when Length >= 6 ->
 read_chunk_header(Packet, Offset, Length, Hep0) ->
 	<<_:Offset/binary, VendorId:16, ChunkId:16, ChunkLen:16, _/binary>> = Packet,
 	case Offset + ChunkLen =< Length of
-		false ->
+		true ->
 			ValueLen = ChunkLen - 6,
 			{ok, Value} = read_chunk_value(Packet, Offset + 6, ValueLen),
 			case decode_chunk(VendorId, ChunkId, ValueLen, Value, Hep0) of
@@ -46,7 +46,7 @@ read_chunk_header(Packet, Offset, Length, Hep0) ->
 				{error, Reason} ->
 					{error, Reason, Packet}
 			end;
-		true ->
+		false ->
 			{error, invalid_packet, Packet}
 	end.
 
