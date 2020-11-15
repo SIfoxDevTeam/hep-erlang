@@ -75,7 +75,11 @@ encode(timestamp, #hep{timestamp = Timestamp} = Hep, Len, Acc) ->
 	ChunkLen2 = 6 + 4,
 	Secs = hep_util:timestamp_secs(Timestamp),
 	Micros = hep_util:timestamp_microsecs(Timestamp),
-	encode(payload_type, Hep, Len + ChunkLen1 + ChunkLen2, [<<0:16, 9:16, ChunkLen1:16, Secs:32, 0:16, 10:16, ChunkLen2:16, Micros:32>> | Acc]);
+	encode(node_id, Hep, Len + ChunkLen1 + ChunkLen2, [<<0:16, 9:16, ChunkLen1:16, Secs:32, 0:16, 10:16, ChunkLen2:16, Micros:32>> | Acc]);
+
+encode(node_id, #hep{node_id = NodeId} = Hep, Len, Acc) ->
+	ChunkLen = 6 + 4,
+	encode(payload_type, Hep, Len + ChunkLen, [<<0:16, 12:16, ChunkLen:16, NodeId:32>> | Acc]);
 
 encode(payload_type, #hep{payload_type = PayloadType} = Hep, Len, Acc) ->
 	case valid_payload_type(PayloadType) of
